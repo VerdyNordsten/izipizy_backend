@@ -1,0 +1,38 @@
+backend menggunakan cyclic
+
+structure table
+
+user
+- id
+- Name 
+- Email
+- Password
+- Phone_number
+- Image_profile
+
+Recipe
+- id_user (FK_User)
+- id
+- name_recipe
+- ingredients
+- video 
+- image
+- created_date
+
+comment
+- id_recipe (FK_recipe)
+- id_user (FK_user)
+- id
+- comment 
+
+like
+- id_recipe (FK_recipe)
+- id_user (FK_user)
+- id
+- count
+
+save
+- id_recipe (FK_recipe)
+- id_user (FK_user)
+- id
+- count
