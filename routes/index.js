@@ -1,7 +1,7 @@
-// const express = require('express')
-// const router = express.Router()
-// // import userRouter from './authRoutes'
+const express = require("express")
+const router = express.Router()
+const categoryRouter = require("./categoryRoutes")
 
-// router.use('/user', userRouter)
+router.use("/category", categoryRouter)
 
-// export default router
+module.exports = router

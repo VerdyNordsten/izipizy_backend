@@ -11,13 +11,14 @@ user
 - Image_profile
 
 Recipe
-- id_user (FK_User)
 - id
 - name_recipe
 - ingredients
 - video 
 - image
-- created_date
+- created_at
+- user_id (FK)
+- category_id (FK)
 
 comment
 - id_recipe (FK_recipe)
