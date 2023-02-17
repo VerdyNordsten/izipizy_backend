@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-undef */
 const uuid = require("uuid")
 const categoryModel = require("../models/categoryModel")
 const commonHelper = require("../helper/common")
@@ -31,8 +29,8 @@ const categoryController = {
         totalPage,
       }
       commonHelper.response(res, result.rows, 200, "get data success", pagination)
-    } catch (error) {
-      console.log(error)
+    } catch (err) {
+      console.log(err)
     }
   },
 
@@ -107,8 +105,8 @@ const categoryController = {
             .catch((err) => res.send(err))
         })
         .catch((err) => res.send(err))
-    } catch (error) {
-      console.log(error)
+    } catch (err) {
+      console.log(err)
     }
   },
 
@@ -127,8 +125,8 @@ const categoryController = {
           commonHelper.response(res, result.rows, 200, "Category has been deleted")
         })
         .catch((err) => res.send(err))
-    } catch (error) {
-      console.log(error)
+    } catch (err) {
+      console.log(err)
     }
   },
 }

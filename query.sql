@@ -17,15 +17,13 @@ CREATE TABLE recipe (
     image VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_id VARCHAR NOT NULL,
-    category_id VARCHAR NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (category_id) REFERENCES category(id)
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE category (
-    id VARCHAR PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE
-);
+-- CREATE TABLE category (
+--     id VARCHAR PRIMARY KEY,
+--     name VARCHAR(255) NOT NULL UNIQUE
+-- );
 
 CREATE TABLE save_recipe (
     id VARCHAR PRIMARY KEY,

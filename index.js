@@ -17,7 +17,7 @@ app.use(xss())
 
 app.use("/api/v1", mainRouter)
 
-// app.use("/img", express.static("upload"))
+app.use("/img", express.static("upload"))
 
 app.all("*", (req, res, next) => {
   next(new createError.NotFound())

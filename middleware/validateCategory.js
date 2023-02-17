@@ -1,6 +1,3 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-undef */
-
 const validateCategory = async (req, res, next) => {
   const { name } = req.body;
   try {
@@ -12,8 +9,8 @@ const validateCategory = async (req, res, next) => {
       checkName(name)
     ]);
     next();
-  } catch (error) {
-    return res.json({ message: error.message });
+  } catch (err) {
+    return res.json({ message: err.message });
   }
 };
 
