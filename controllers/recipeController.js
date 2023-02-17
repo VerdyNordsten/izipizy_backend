@@ -55,8 +55,10 @@ const recipeController = {
   },
 
   createRecipe: async (req, res) => {
-    const { name_recipe, ingredients, video } = req.body
+    const { name_recipe, ingredients } = req.body
     const id = uuid.v4()
+    
+    const videoUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
     const imageUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
 
     // Extract the user ID from the decoded token
@@ -66,7 +68,7 @@ const recipeController = {
       id,
       name_recipe,
       ingredients,
-      video,
+      video: videoUrl.secure_url,
       image: imageUrl.secure_url,
       user_id: userId,
     }
