@@ -5,8 +5,7 @@ const createError = require("http-errors")
 const morgan = require("morgan")
 const helmet = require("helmet")
 const xss = require("xss-clean")
-// const mainRouter = require('./routes/index')
-const helloRoutes = require("./routes/helloRoutes")
+const mainRouter = require("./routes/index")
 
 const app = express()
 const port = process.env.PORT
@@ -16,9 +15,9 @@ app.use(morgan("dev"))
 app.use(helmet())
 app.use(xss())
 
-app.use("/api/v1", helloRoutes)
+app.use("/api/v1", mainRouter)
 
-// app.use("/img", express.static("upload"))
+app.use("/img", express.static("upload"))
 
 app.all("*", (req, res, next) => {
   next(new createError.NotFound())
