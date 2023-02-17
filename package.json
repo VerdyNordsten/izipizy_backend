@@ -12,7 +12,10 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cloudinary": "^1.34.0",
+<<<<<<< HEAD
     "cors": "^2.8.5",
+=======
+>>>>>>> d0437119f84e442bafef821447b84ecb19388e38
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "helmet": "^6.0.1",
