@@ -52,7 +52,7 @@ const validateUpdateUser = async (req, res, next) => {
   try {
     const checkNameUpdate = async (name) => {
       if (!name) return
-      if (!/^[a-zA-Z ]+$/.test(name)) throw new Error("Full Name must be alphabetic")
+      if (!/^[a-zA-Z ]+$/.test(name)) throw new Error("Name must be alphabetic")
     }
     const checkEmailUpdate = async (email) => {
       if (!email) return
