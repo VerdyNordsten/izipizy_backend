@@ -6,6 +6,7 @@ const authHelper = require("../helper/auth")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const saltRounds = 10
+var cloudinary = require("../config/cloudinary")
 
 const userController = {
   registerUser: async (req, res) => {
@@ -84,6 +85,43 @@ const userController = {
     } = await userModel.findEmail(email)
     delete user.password
     commonHelper.response(res, user, 200, "Get data profile is successful")
+  },
+
+  editProfile: async (req, res) => {
+    const email = req.payload.email
+    const { password } = req.body
+
+    let hashPassword
+    let imageProfile
+
+    const dataPw = await userModel.findEmail(email)
+    if (!password) {
+      hashPassword = dataPw.rows[0].password
+    } else {
+      hashPassword = await bcrypt.hash(password, saltRounds)
+    }
+
+    if (req.file) {
+      const imageUrl = await cloudinary.uploader.upload(req.file.path, {
+        folder: "izipizy",
+      })
+      imageProfile = imageUrl.secure_url
+    } else {
+      imageProfile = dataPw.rows[0].image_profile
+    }
+
+    await userModel.editProfile(hashPassword, imageProfile, email)
+
+    // Menghapus kolom password dari respons data
+    const responseData = {
+      id: dataPw.rows[0].id,
+      name: dataPw.rows[0].name,
+      email: dataPw.rows[0].email,
+      phone_number: dataPw.rows[0].phone_number,
+      image_profile: dataPw.rows[0].image_profile,
+    }
+
+    commonHelper.response(res, responseData, 200, "edit profile is successful")
   },
 }
 
