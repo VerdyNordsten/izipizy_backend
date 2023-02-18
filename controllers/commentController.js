@@ -1,38 +1,52 @@
 const uuid = require("uuid")
 const commentModel = require("../models/commentModel")
 const commonHelper = require("../helper/common")
+const moment = require("moment");
 
 const commentController = {
   getCommentById: async (req, res) => {
-    const id = req.params.id
-    const { rowCount } = await commentModel.getCommentById(id)
-    if (!rowCount) {
-      return res.json({
-        Message: "Comment not found",
-      })
+    try {
+      const id = req.params.id;
+      const comment = await commentModel.getCommentById(id);
+      if (!comment) {
+        return res.json({
+          Message: "Comment not found",
+        });
+      }
+      const formattedComment = {
+        ...comment,
+        created_at: moment(comment.created_at).format("DD MMMM YYYY HH:mm"),
+      };
+      commonHelper.response(res, formattedComment, 200, "get data success");
+    } catch (err) {
+      res.json({ message: err.message });
     }
-    commentModel
-      .getCommentById(id)
-      .then((result) => {
-        commonHelper.response(res, result.rows[0], 200, "get data success")
-      })
-      .catch((err) => res.send(err))
-  },
+  },  
 
   getCommentsByRecipe: async (req, res) => {
     try {
-      const recipeId = req.params.id
-      const comments = await commentModel.getCommentsByRecipe(recipeId)
-
+      const recipeId = req.params.id;
+      const sortBy = req.query.sortBy || 'desc'; // default to descending
+      const comments = await commentModel.getCommentsByRecipe(recipeId, sortBy);
+  
       if (comments.length === 0) {
-        return commonHelper.response(res, null, 404, "No comments found for this recipe")
+        return commonHelper.response(res, null, 404, "No comments found for this recipe");
       }
-
-      commonHelper.response(res, comments, 200, "Comments have been retrieved")
+  
+      const formattedComments = comments.map(comment => ({
+        ...comment,
+        created_at: moment(comment.created_at).format('DD MMMM YYYY HH:mm')
+      }));
+  
+      const sortedComments = sortBy === 'asc'
+        ? formattedComments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+        : formattedComments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  
+      commonHelper.response(res, sortedComments, 200, "Comments have been retrieved");
     } catch (err) {
-      res.json({ message: err.message })
+      res.json({ message: err.message });
     }
-  },
+  },  
 
   createComment: async (req, res) => {
     try {
@@ -65,7 +79,7 @@ const commentController = {
     try {
       const id = req.params.id
       const { comment_text } = req.body
-      const { rowCount, rows } = await commentModel.getCommentById(id)
+      const { rowCount, rows } = await commentModel.findCommentId(id)
       if (!rowCount) {
         return res.json({
           message: "Comment not found",
@@ -92,7 +106,7 @@ const commentController = {
         .updateComment(updateQuery, data)
         .then(() => {
           commentModel
-            .getCommentById(id)
+            .findCommentId(id)
             .then((comment) => {
               commonHelper.response(res, comment.rows[0], 200, message)
             })
@@ -107,7 +121,7 @@ const commentController = {
   deleteComment: async (req, res) => {
     try {
       const id = req.params.id
-      const { rowCount, rows } = await commentModel.getCommentById(id)
+      const { rowCount, rows } = await commentModel.findCommentId(id)
       if (!rowCount) {
         return commonHelper.response(res, null, 404, "Comment not found")
       }
