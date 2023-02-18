@@ -121,7 +121,7 @@ const userController = {
       image_profile: dataPw.rows[0].image_profile,
     }
 
-    commonHelper.response(res, responseData, 200, "edit profile is successful")
+    commonHelper.response(res, responseData, 200, "Edit profile is successful")
   },
 }
 
