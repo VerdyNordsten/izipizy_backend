@@ -55,30 +55,30 @@ const recipeController = {
   },
 
   createRecipe: async (req, res) => {
-    const { name_recipe, ingredients, video } = req.body
-    const id = uuid.v4()
-  
-    const imageUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
-  
-    // Extract the user ID from the decoded token
-    const userId = req.payload.id
-  
-    const data = {
-      id,
-      name_recipe,
-      ingredients,
-      video,
-      image: imageUrl.secure_url,
-      user_id: userId,
-    }
-  
-    recipeModel
-      .insertRecipe(data)
-      .then((result) => {
-        commonHelper.response(res, result.rows, 201, "Recipe has been created")
-      })
-      .catch((err) => res.send(err))
-  },  
+  const { name_recipe, ingredients, video } = req.body
+  const id = uuid.v4()
+
+  const imageUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
+
+  // Extract the user ID from the decoded token
+  const userId = req.payload.id
+
+  const data = {
+    id,
+    name_recipe,
+    ingredients,
+    video,
+    image: imageUrl.secure_url,
+    user_id: userId,
+  }
+
+  recipeModel
+    .insertRecipe(data)
+    .then((result) => {
+      commonHelper.response(res, result.rows, 201, "Recipe has been created")
+    })
+    .catch((err) => res.send(err))
+},
 
   updateRecipe: async (req, res) => {
     try {

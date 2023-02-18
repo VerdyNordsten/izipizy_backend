@@ -38,7 +38,7 @@ const validateRegister = async (req, res, next) => {
     }
     const checkPhoneRegister = async (phone) => {
       if (phone === "") throw new Error("Phone number is required")
-      if (!/^\d{10}$/.test(phone)) throw new Error("Invalid phone number format")
+      if (!/^\d{0,13}$/.test(phone)) throw new Error("Invalid phone number format")
     }
     await Promise.all([checkNameRegister(name), checkEmailRegister(email), checkPasswordRegister(password), checkPhoneRegister(phone)])
     next()
