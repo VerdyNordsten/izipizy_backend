@@ -5,7 +5,7 @@ const { verifyToken } = require('../middleware/auth')
 // const { validateSave } = require('../middleware/validateSave')
 
 
-router.get("/", saveController.getAllSave)
+router.get("/", verifyToken, saveController.getSavesByUser)
 router.get("/recipe/:id", saveController.getSavesByRecipe)
 router.get("/:id", saveController.getSaveById)
 router.post("/", verifyToken, saveController.createSave)
