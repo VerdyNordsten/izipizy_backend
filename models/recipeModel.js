@@ -10,9 +10,9 @@ const selectRecipe = (id) => {
 }
 
 const insertRecipe = (data) => {
-  const { id, name_recipe, ingredients, video, image, user_id } = data
-  const query = "INSERT INTO recipe(id, name_recipe, ingredients, video, image, user_id) VALUES($1, $2, $3, $4, $5, $6)"
-  const values = [id, name_recipe, ingredients, video, image, user_id]
+  const { id, name_recipe, description, ingredients, video, image, user_id } = data
+  const query = "INSERT INTO recipe(id, name_recipe, description, ingredients, video, image, user_id) VALUES($1, $2, $3, $4, $5, $6, $7)"
+  const values = [id, name_recipe, description, ingredients, video, image, user_id]
   return Pool.query(query, values)
 }
 
@@ -29,15 +29,7 @@ const countData = () => {
 }
 
 const findId = (id) => {
-  return new Promise((resolve, reject) =>
-    Pool.query(`SELECT id FROM recipe WHERE id='${id}'`, (error, result) => {
-      if (!error) {
-        resolve(result)
-      } else {
-        reject(error)
-      }
-    })
-  )
+  return Pool.query("SELECT * FROM recipe WHERE id = $1", [id])
 }
 
 const findName = (name) => {
