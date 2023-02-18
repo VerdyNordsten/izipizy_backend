@@ -6,6 +6,7 @@ const { verifyToken } = require('../middleware/auth')
 const upload = require('../middleware/validateUpload')
 
 router.get('/', recipeController.getAllRecipe)
+router.get('/myrecipe', verifyToken, recipeController.getMyRecipe)
 router.get('/:id', recipeController.getDetailRecipe)
 router.post('/', verifyToken, upload.single('image'), recipeController.createRecipe)
 router.put('/:id', verifyToken, upload.single('image'), recipeController.updateRecipe)

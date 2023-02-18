@@ -5,6 +5,20 @@ const selectAllRecipe = (limit, offset, searchParam, sortBY, sort) => {
   return Pool.query(`SELECT * FROM recipe WHERE lower(name_recipe) LIKE '%${searchParam}%' ORDER BY ${sortBY} ${sort} LIMIT ${limit} OFFSET ${offset}`)
 }
 
+const getMyRecipe = async (id, sortBy) => {
+  const query = {
+    text: `
+      SELECT *
+      FROM recipe 
+      WHERE user_id = $1
+      ORDER BY created_at ${sortBy}
+    `,
+    values: [id],
+  }
+  const result = await Pool.query(query)
+  return result.rows
+}
+
 const selectRecipe = (id) => {
   return Pool.query(`SELECT * FROM recipe WHERE id='${id}'`)
 }
@@ -62,6 +76,7 @@ const findName = (name) => {
 
 module.exports = {
   selectAllRecipe,
+  getMyRecipe,
   selectRecipe,
   getSavedCountByRecipeId,
   getLikedCountByRecipeId,
