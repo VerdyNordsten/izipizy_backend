@@ -50,6 +50,31 @@ const recipeController = {
     }
   },
 
+  getMyRecipe: async (req, res) => {
+    try {
+      const userId = req.payload.id;
+      const sortBy = req.query.sortBy || "desc";
+      const result = await recipeModel.getMyRecipe(userId, sortBy);
+      if (!result) {
+        return res.json({
+          Message: "Recipe not found",
+        });
+      }
+      const responseData = result.map((like) => {
+        return {
+          id: like.id,
+          recipe_id: like.recipe_id,
+          name_recipe: like.name_recipe,
+          image: like.image,
+          created_at: moment(like.created_at).format('DD MMMM YYYY HH:mm')
+        };
+      });
+      commonHelper.response(res, responseData, 200, "Get data Recipe by user success");
+    } catch (err) {
+      res.json({ message: err.message });
+    }
+  },
+
   getDetailRecipe: async (req, res) => {
     try {
       const id = req.params.id
