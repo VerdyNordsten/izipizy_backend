@@ -15,12 +15,6 @@ const insertUser = async (data) => {
   );
 };
 
-// const editProfile = async (password, photo, email) => {
-//   return await Pool.query(
-//     `UPDATE users SET image_profile='${photo}', password='${password}' WHERE email='${email}'`
-//   );
-// };
-
 const editProfile = (password, photo, email) => {
   return new Promise((resolve, reject) =>
     Pool.query(

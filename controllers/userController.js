@@ -87,27 +87,62 @@ const userController = {
     commonHelper.response(res, user, 200, "Get data profile is successful");
   },
 
+  // editProfile: async (req, res) => {
+  //   const email = req.payload.email;
+  //   const { password } = req.body;
+  //   const hashPassword = await bcrypt.hash(password, saltRounds);
+  //   // const imageUrl = await cloudinary.uploader.upload(req.file.path, {
+  //   //   folder: "izipizy",
+  //   // });
+  //   let photo;
+  //   if (req.file) {
+  //     const imageUrl = await cloudinary.uploader.upload(req.file.path, {
+  //       folder: "izipizy",
+  //     });
+  //     photo = imageUrl.secure_url;
+  //   }
+  //   const result = await userModel.editProfile(hashPassword, photo, email);
+  //   const dataProfile = await userModel.findEmail(email);
+  //   commonHelper.response(
+  //     res,
+  //     dataProfile.rows[0],
+  //     200,
+  //     "Get data profile is successful"
+  //   );
+  // },
+
   editProfile: async (req, res) => {
     const email = req.payload.email;
     const { password } = req.body;
-    const hashPassword = await bcrypt.hash(password, saltRounds);
-    // const imageUrl = await cloudinary.uploader.upload(req.file.path, {
-    //   folder: "izipizy",
-    // });
-    let photo;
+
+    let hashPassword;
+    let image;
+
+    const dataPw = await userModel.findEmail(email);
+    if (!password) {
+      hashPassword = dataPw.rows[0].password;
+    } else {
+      hashPassword = await bcrypt.hash(password, saltRounds);
+    }
+
     if (req.file) {
       const imageUrl = await cloudinary.uploader.upload(req.file.path, {
         folder: "izipizy",
       });
-      photo = imageUrl.secure_url;
+      image = imageUrl.secure_url;
+    } else {
+      image = dataPw.rows[0].password;
     }
-    const result = await userModel.editProfile(hashPassword, photo, email);
+
+    await userModel.editProfile(hashPassword, image, email);
+
     const dataProfile = await userModel.findEmail(email);
+
     commonHelper.response(
       res,
       dataProfile.rows[0],
       200,
-      "Get data profile is successful"
+      "edit profile is successful"
     );
   },
 };
