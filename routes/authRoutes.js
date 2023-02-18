@@ -8,5 +8,6 @@ router.post("/register", validateRegister, userController.registerUser)
 router.post("/login", validateLogin, userController.loginUser)
 router.post("/refresh-token", userController.refreshToken)
 router.get("/profile", verifyToken, userController.profileUser)
+// router.get("/edit", verifyToken, userController.editUser)
 
 module.exports = router
