@@ -20,6 +20,8 @@ CREATE TABLE recipe (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+ALTER TABLE recipe ADD COLUMN description TEXT NOT NULL;
+
 -- CREATE TABLE category (
 --     id VARCHAR PRIMARY KEY,
 --     name VARCHAR(255) NOT NULL UNIQUE
