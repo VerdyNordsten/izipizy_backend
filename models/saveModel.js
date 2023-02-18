@@ -1,21 +1,32 @@
 const Pool = require("../config/db")
 
-const getAllSave = async (limit, offset, sort) => {
+const getSavesByUser = async (id, sortBy) => {
   const query = {
-    text: `SELECT * FROM save_recipe ORDER BY recipe_id ${sort} LIMIT $1 OFFSET $2`,
-    values: [limit, offset],
+    text: `
+      SELECT save_recipe.*, recipe.name_recipe, recipe.image
+      FROM save_recipe 
+      INNER JOIN recipe ON save_recipe.recipe_id = recipe.id 
+      WHERE save_recipe.user_id = $1
+      ORDER BY save_recipe.id ${sortBy}
+    `,
+    values: [id],
   }
-  try {
-    const result = await Pool.query(query)
-    return result.rows
-  } catch (err) {
-    console.error(err)
-    throw err
-  }
+  const result = await Pool.query(query)
+  return result.rows
 }
 
-const getSaveById = (id) => {
-  return Pool.query(`SELECT * FROM save_recipe WHERE id='${id}'`)
+const getSaveById = async (id) => {
+  const query = {
+    text: `
+      SELECT save_recipe.*, recipe.name_recipe, recipe.image
+      FROM save_recipe 
+      INNER JOIN recipe ON save_recipe.recipe_id = recipe.id 
+      WHERE save_recipe.id = $1
+    `,
+    values: [id],
+  }
+  const result = await Pool.query(query)
+  return result.rows[0]
 }
 
 const getSaveByUserAndRecipe = async (userId, recipeId) => {
@@ -52,7 +63,7 @@ const countData = () => {
 }
 
 module.exports = {
-  getAllSave,
+  getSavesByUser,
   getSaveById,
   getSaveByUserAndRecipe,
   getSavesByRecipe,

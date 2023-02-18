@@ -3,50 +3,49 @@ const likeModel = require("../models/likeModel")
 const commonHelper = require("../helper/common")
 
 const likeController = {
-  getAllLike: async (req, res) => {
+  getLikesByUser: async (req, res) => {
     try {
-      const page = Number(req.query.page) || 1
-      const limit = Number(req.query.limit) || 10000
-      const offset = (page - 1) * limit
-      const sort = req.query.sort || "ASC"
-      const result = await likeModel.getAllLike(limit, offset, sort)
-      if (result.length === 0) {
+      // Extract the user ID from the decoded token
+      const userId = req.payload.id
+
+      const sortBy = req.query.sortBy || "desc" // default to descending
+      const result = await likeModel.getLikesByUser(userId, sortBy)
+      if (!result) {
         return res.json({
-          message: "Data not found",
+          Message: "Likes not found",
         })
       }
-      const {
-        rows: [count],
-      } = await likeModel.countData()
-      const totalData = parseInt(count.count)
-      const totalPage = Math.ceil(totalData / limit)
-      const pagination = {
-        currentPage: page,
-        limit,
-        totalData,
-        totalPage,
-      }
-      commonHelper.response(res, result, 200, "Get all like data success", pagination)
-    } catch (error) {
-      console.log(error)
-      return commonHelper.response(res, [], 500, "Error retrieving liked data")
+      const responseData = result.map((like) => {
+        return {
+          id: like.id,
+          user_id: like.user_id,
+          recipe_id: like.recipe_id,
+          name_recipe: like.name_recipe,
+          image: like.image,
+        }
+      })
+      commonHelper.response(res, responseData, 200, "Get data liked by user success")
+    } catch (err) {
+      res.json({ message: err.message })
     }
   },
 
   getLikeById: async (req, res) => {
     const id = req.params.id
-    const { rowCount } = await likeModel.getLikeById(id)
-    if (!rowCount) {
+    const result = await likeModel.getLikeById(id)
+    if (!result) {
       return res.json({
         Message: "Like not found",
       })
     }
-    likeModel
-      .getLikeById(id)
-      .then((result) => {
-        commonHelper.response(res, result.rows[0], 200, "Get data liked by id success")
-      })
-      .catch((err) => res.send(err))
+    const responseData = {
+      id: result.id,
+      user_id: result.user_id,
+      recipe_id: result.recipe_id,
+      name_recipe: result.name_recipe,
+      image: result.image,
+    }
+    commonHelper.response(res, responseData, 200, "Get data liked by id success")
   },
 
   getLikesByRecipe: async (req, res) => {

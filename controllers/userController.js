@@ -56,7 +56,7 @@ const userController = {
         email: user.email,
         id: user.id, // add the user ID to the payload
       }
-      console.log(payload)
+      // console.log(payload)
       user.token = authHelper.generateToken(payload)
       user.refreshToken = authHelper.generateRefreshToken(payload)
       commonHelper.response(res, user, 201, "login is successful")

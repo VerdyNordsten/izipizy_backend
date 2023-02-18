@@ -1,21 +1,37 @@
 const Pool = require("../config/db")
 
-const getCommentById = (id) => {
-  return Pool.query(`SELECT * FROM comment WHERE id='${id}'`)
-}
-
-const getCommentByUserAndRecipe = async (userId, recipeId) => {
+const getCommentById = async (id) => {
   const query = {
-      text: 'SELECT * FROM comment WHERE user_id = $1 AND recipe_id = $2',
-      values: [userId, recipeId],
+    text: `
+      SELECT comment.*, users.name, users.image_profile
+      FROM comment 
+      INNER JOIN users ON comment.user_id = users.id 
+      WHERE comment.id = $1
+    `,
+    values: [id],
   }
   const result = await Pool.query(query)
   return result.rows[0]
 }
 
-const getCommentsByRecipe = async (recipeId) => {
+const getCommentByUserAndRecipe = async (userId, recipeId) => {
   const query = {
-    text: 'SELECT * FROM comment WHERE recipe_id = $1',
+    text: "SELECT * FROM comment WHERE user_id = $1 AND recipe_id = $2",
+    values: [userId, recipeId],
+  }
+  const result = await Pool.query(query)
+  return result.rows[0]
+}
+
+const getCommentsByRecipe = async (recipeId, sortBy) => {
+  const query = {
+    text: `
+      SELECT comment.*, users.name, users.image_profile
+      FROM comment 
+      INNER JOIN users ON comment.user_id = users.id 
+      WHERE comment.recipe_id = $1
+      ORDER BY created_at ${sortBy}
+    `,
     values: [recipeId],
   }
   const result = await Pool.query(query)
@@ -37,6 +53,10 @@ const deleteComment = (id) => {
   return Pool.query("DELETE FROM comment WHERE id=$1", [id])
 }
 
+const findCommentId = (id) => {
+  return Pool.query("SELECT * FROM comment WHERE id = $1", [id])
+}
+
 const findComment = (comment_text) => {
   return Pool.query("SELECT * FROM comment WHERE comment_text = $1", [comment_text])
 }
@@ -48,5 +68,6 @@ module.exports = {
   insertComment,
   updateComment,
   deleteComment,
+  findCommentId,
   findComment,
 }

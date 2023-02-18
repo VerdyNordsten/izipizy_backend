@@ -5,7 +5,7 @@ const { verifyToken } = require('../middleware/auth')
 // const { validateSave } = require('../middleware/validateSave')
 
 
-router.get("/", likeController.getAllLike)
+router.get("/", verifyToken, likeController.getLikesByUser)
 router.get("/recipe/:id", likeController.getLikesByRecipe)
 router.get("/:id", likeController.getLikeById)
 router.post("/", verifyToken, likeController.createLike)
