@@ -51,23 +51,30 @@ const recipeController = {
   },
 
   getDetailRecipe: async (req, res) => {
-    const id = req.params.id
-    const { rowCount } = await recipeModel.findId(id)
-    if (!rowCount) {
-      return res.json({
-        Message: "Data not found",
-      })
+    try {
+      const id = req.params.id
+      const { rowCount } = await recipeModel.findId(id)
+      if (!rowCount) {
+        return res.json({
+          Message: "Data not found",
+        })
+      }
+
+      const recipe = await recipeModel.selectRecipe(id)
+      const saved = await recipeModel.getSavedCountByRecipeId(id)
+      const liked = await recipeModel.getLikedCountByRecipeId(id)
+
+      const data = {
+        ...recipe.rows[0],
+        created_at: moment(recipe.rows[0].created_at).format("DD MMMM YYYY HH:mm"),
+        saved_count: saved.count,
+        liked_count: liked.count,
+      }
+
+      commonHelper.response(res, data, 200, "Get data success")
+    } catch (err) {
+      res.json({ message: err.message })
     }
-    recipeModel
-      .selectRecipe(id)
-      .then((result) => {
-        const data = {
-          ...result.rows[0],
-          created_at: moment(result.rows[0].created_at).format("DD MMMM YYYY HH:mm")
-        }
-        commonHelper.response(res, data, 200, "Get data success")
-      })
-      .catch((err) => res.send(err))
   },
 
   createRecipe: async (req, res) => {

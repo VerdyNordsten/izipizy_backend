@@ -9,6 +9,30 @@ const selectRecipe = (id) => {
   return Pool.query(`SELECT * FROM recipe WHERE id='${id}'`)
 }
 
+const getSavedCountByRecipeId = async (id) => {
+  const query = {
+    text: `
+      SELECT COUNT(*) FROM save_recipe 
+      WHERE recipe_id = $1
+    `,
+    values: [id],
+  }
+  const result = await Pool.query(query)
+  return result.rows[0]
+}
+
+const getLikedCountByRecipeId = async (id) => {
+  const query = {
+    text: `
+      SELECT COUNT(*) FROM like_recipe 
+      WHERE recipe_id = $1
+    `,
+    values: [id],
+  }
+  const result = await Pool.query(query)
+  return result.rows[0]
+}
+
 const insertRecipe = (data) => {
   const { id, name_recipe, description, ingredients, video, image, user_id } = data
   const query = "INSERT INTO recipe(id, name_recipe, description, ingredients, video, image, user_id) VALUES($1, $2, $3, $4, $5, $6, $7)"
@@ -39,6 +63,8 @@ const findName = (name) => {
 module.exports = {
   selectAllRecipe,
   selectRecipe,
+  getSavedCountByRecipeId,
+  getLikedCountByRecipeId,
   insertRecipe,
   updateRecipe,
   deleteRecipe,

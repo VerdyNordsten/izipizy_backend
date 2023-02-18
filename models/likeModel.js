@@ -1,21 +1,32 @@
 const Pool = require("../config/db")
 
-const getAllLike = async (limit, offset, sort) => {
+const getLikesByUser = async (id, sortBy) => {
   const query = {
-    text: `SELECT * FROM like_recipe ORDER BY recipe_id ${sort} LIMIT $1 OFFSET $2`,
-    values: [limit, offset],
+    text: `
+      SELECT like_recipe.*, recipe.name_recipe, recipe.image
+      FROM like_recipe 
+      INNER JOIN recipe ON like_recipe.recipe_id = recipe.id 
+      WHERE like_recipe.user_id = $1
+      ORDER BY like_recipe.id ${sortBy}
+    `,
+    values: [id],
   }
-  try {
-    const result = await Pool.query(query)
-    return result.rows
-  } catch (err) {
-    console.error(err)
-    throw err
-  }
+  const result = await Pool.query(query)
+  return result.rows
 }
 
-const getLikeById = (id) => {
-  return Pool.query(`SELECT * FROM like_recipe WHERE id='${id}'`)
+const getLikeById = async (id) => {
+  const query = {
+    text: `
+      SELECT like_recipe.*, recipe.name_recipe, recipe.image
+      FROM like_recipe 
+      INNER JOIN recipe ON like_recipe.recipe_id = recipe.id 
+      WHERE like_recipe.id = $1
+    `,
+    values: [id],
+  }
+  const result = await Pool.query(query)
+  return result.rows[0]
 }
 
 const getLikeByUserAndRecipe = async (userId, recipeId) => {
@@ -52,7 +63,7 @@ const countData = () => {
 }
 
 module.exports = {
-  getAllLike,
+  getLikesByUser,
   getLikeById,
   getLikeByUserAndRecipe,
   getLikesByRecipe,
