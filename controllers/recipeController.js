@@ -1,6 +1,3 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-undef */
-// const userModel = require("../models/userModel")
 const recipeModel = require("../models/recipeModel")
 const commonHelper = require("../helper/common")
 const uuid = require("uuid")
@@ -17,11 +14,13 @@ const recipeController = {
       const sort = req.query.sort || "desc"
       const searchParam = req.query.search ? req.query.search.toLowerCase() : ""
       const result = await recipeModel.selectAllRecipe(limit, offset, searchParam, sortBY, sort)
+
       if (result.rowCount === 0) {
         return res.json({
           message: "Data not found",
         })
       }
+
       const {
         rows: [count],
       } = await recipeModel.countData()
@@ -33,18 +32,15 @@ const recipeController = {
         totalData,
         totalPage,
       }
-      commonHelper.response(
-        res,
-        result.rows.map((data) => {
-          return {
-            ...data,
-            created_at: moment(data.created_at).format("DD MMMM YYYY HH:mm"),
-          }
-        }),
-        200,
-        "Get data success",
-        pagination
-      )
+
+      const data = result.rows.map((row) => ({
+        ...row,
+        created_at: moment(row.created_at).format("DD MMMM YYYY HH:mm"),
+        likes: row.likes,
+        saves: row.saves,
+      }))
+
+      commonHelper.response(res, data, 200, "Get data success", pagination)
     } catch (err) {
       res.json({ message: err.message })
     }
@@ -52,13 +48,13 @@ const recipeController = {
 
   getMyRecipe: async (req, res) => {
     try {
-      const userId = req.payload.id;
-      const sortBy = req.query.sortBy || "desc";
-      const result = await recipeModel.getMyRecipe(userId, sortBy);
+      const userId = req.payload.id
+      const sortBy = req.query.sortBy || "desc"
+      const result = await recipeModel.getMyRecipe(userId, sortBy)
       if (!result) {
         return res.json({
           Message: "Recipe not found",
-        });
+        })
       }
       const responseData = result.map((like) => {
         return {
@@ -66,12 +62,12 @@ const recipeController = {
           recipe_id: like.recipe_id,
           name_recipe: like.name_recipe,
           image: like.image,
-          created_at: moment(like.created_at).format('DD MMMM YYYY HH:mm')
-        };
-      });
-      commonHelper.response(res, responseData, 200, "Get data Recipe by user success");
+          created_at: moment(like.created_at).format("DD MMMM YYYY HH:mm"),
+        }
+      })
+      commonHelper.response(res, responseData, 200, "Get data Recipe by user success")
     } catch (err) {
-      res.json({ message: err.message });
+      res.json({ message: err.message })
     }
   },
 
@@ -207,13 +203,9 @@ const recipeController = {
         return commonHelper.response(res, null, 401, "You are not authorized to delete this recipe")
       }
 
-      recipeModel
-        .deleteRecipe(id)
-        .then((result) => {
-          // console.log(result)
-          commonHelper.response(res, result.rows, 200, "Recipe has been deleted")
-        })
-        .catch((err) => res.send(err))
+      await recipeModel.deleteRecipe(id)
+
+      commonHelper.response(res, null, 200, "Recipe has been deleted")
     } catch (error) {
       console.log(error)
     }
