@@ -1,8 +1,23 @@
 /* eslint-disable camelcase */
 const Pool = require("../config/db")
 
-const selectAllRecipe = (limit, offset, searchParam, sortBY, sort) => {
-  return Pool.query(`SELECT * FROM recipe WHERE lower(name_recipe) LIKE '%${searchParam}%' ORDER BY ${sortBY} ${sort} LIMIT ${limit} OFFSET ${offset}`)
+const selectAllRecipe = async (limit, offset, searchParam, sortBY, sort) => {
+  let query = `SELECT recipe.*, users.name AS author FROM recipe LEFT JOIN users ON recipe.user_id = users.id WHERE LOWER(name_recipe) LIKE '%${searchParam}%' ORDER BY ${sortBY} ${sort} LIMIT ${limit} OFFSET ${offset}`
+  const { rows } = await Pool.query(query)
+
+  const result = await Promise.all(
+    rows.map(async (row) => {
+      const { rows: likes } = await Pool.query(`SELECT COUNT(*) FROM like_recipe WHERE recipe_id='${row.id}'`)
+      const { rows: saves } = await Pool.query(`SELECT COUNT(*) FROM save_recipe WHERE recipe_id='${row.id}'`)
+      return {
+        ...row,
+        likes: likes[0].count,
+        saves: saves[0].count,
+      }
+    })
+  )
+
+  return { rowCount: result.length, rows: result }
 }
 
 const getMyRecipe = async (id, sortBy) => {
@@ -58,8 +73,30 @@ const updateRecipe = (updateQuery, data) => {
   return Pool.query(`UPDATE recipe SET ${updateQuery} WHERE id=$${Object.keys(data).length}`, Object.values(data))
 }
 
-const deleteRecipe = (id) => {
-  return Pool.query(`DELETE FROM recipe WHERE id='${id}'`)
+const deleteRecipe = async (id) => {
+  const client = await Pool.connect()
+  try {
+    await client.query("BEGIN")
+
+    // Delete related data from save_recipe
+    await client.query(`DELETE FROM save_recipe WHERE recipe_id='${id}'`)
+
+    // Delete related data from like_recipe
+    await client.query(`DELETE FROM like_recipe WHERE recipe_id='${id}'`)
+
+    // Delete related data from comment
+    await client.query(`DELETE FROM comment WHERE recipe_id='${id}'`)
+
+    // Delete the recipe
+    await client.query(`DELETE FROM recipe WHERE id='${id}'`)
+
+    await client.query("COMMIT")
+  } catch (err) {
+    await client.query("ROLLBACK")
+    throw err
+  } finally {
+    client.release()
+  }
 }
 
 const countData = () => {

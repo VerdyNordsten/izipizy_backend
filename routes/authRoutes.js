@@ -9,6 +9,6 @@ router.post("/register", validateRegister, userController.registerUser)
 router.post("/login", validateLogin, userController.loginUser)
 router.post("/refresh-token", userController.refreshToken)
 router.get("/profile", verifyToken, userController.profileUser)
-router.put("/edit", verifyToken, upload.single("image"), userController.editProfile)
+router.put("/edit/:id", verifyToken, upload.single("image"), userController.editProfile)
 
 module.exports = router
