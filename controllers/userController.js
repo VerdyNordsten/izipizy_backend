@@ -88,13 +88,18 @@ const userController = {
   },
 
   editProfile: async (req, res) => {
-    const email = req.payload.email
-    const { password } = req.body
+    const userId = req.payload.id
+    const id = req.params.id
+    const { name, password } = req.body
+
+    if (userId !== id) {
+      return commonHelper.response(res, null, 401, "You are not authorized to edit this profile")
+    }
 
     let hashPassword
     let imageProfile
 
-    const dataPw = await userModel.findEmail(email)
+    const dataPw = await userModel.findId(id)
     if (!password) {
       hashPassword = dataPw.rows[0].password
     } else {
@@ -110,9 +115,8 @@ const userController = {
       imageProfile = dataPw.rows[0].image_profile
     }
 
-    await userModel.editProfile(hashPassword, imageProfile, email)
+    await userModel.editProfile(name, hashPassword, imageProfile, id)
 
-    // Menghapus kolom password dari respons data
     const responseData = {
       id: dataPw.rows[0].id,
       name: dataPw.rows[0].name,
