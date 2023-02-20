@@ -88,45 +88,50 @@ const userController = {
   },
 
   editProfile: async (req, res) => {
-    const userId = req.payload.id
-    const id = req.params.id
-    const { name, password } = req.body
-
+    const userId = req.payload.id;
+    const id = req.params.id;
+    const { name, password } = req.body;
+    let imageProfile;
+  
     if (userId !== id) {
-      return commonHelper.response(res, null, 401, "You are not authorized to edit this profile")
+      return commonHelper.response(res, null, 401, "You are not authorized to edit this profile");
     }
-
-    let hashPassword
-    let imageProfile
-
-    const dataPw = await userModel.findId(id)
-    if (!password) {
-      hashPassword = dataPw.rows[0].password
-    } else {
-      hashPassword = await bcrypt.hash(password, saltRounds)
+  
+    let newData = {};
+    if (name) {
+      newData.name = name;
     }
-
+    if (password) {
+      newData.password = await bcrypt.hash(password, saltRounds);
+    }
+  
     if (req.file) {
       const imageUrl = await cloudinary.uploader.upload(req.file.path, {
         folder: "izipizy",
-      })
-      imageProfile = imageUrl.secure_url
-    } else {
-      imageProfile = dataPw.rows[0].image_profile
+      });
+      imageProfile = imageUrl.secure_url;
     }
-
-    await userModel.editProfile(name, hashPassword, imageProfile, id)
-
+  
+    const dataPw = await userModel.findId(id);
+  
+    const updatedData = {
+      name: newData.name || dataPw.rows[0].name,
+      password: newData.password || dataPw.rows[0].password,
+      image_profile: imageProfile || dataPw.rows[0].image_profile,
+    };
+  
+    await userModel.editProfile(updatedData.name, updatedData.password, updatedData.image_profile, id);
+  
     const responseData = {
       id: dataPw.rows[0].id,
-      name: dataPw.rows[0].name,
+      name: updatedData.name,
       email: dataPw.rows[0].email,
       phone_number: dataPw.rows[0].phone_number,
-      image_profile: dataPw.rows[0].image_profile,
-    }
-
-    commonHelper.response(res, responseData, 200, "Edit profile is successful")
-  },
+      image_profile: updatedData.image_profile,
+    };
+  
+    commonHelper.response(res, responseData, 200, "Edit profile is successful");
+  },  
 }
 
 module.exports = userController
