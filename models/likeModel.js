@@ -59,7 +59,11 @@ const deleteLike = (id) => {
 }
 
 const countData = () => {
-  return Pool.query("SELECT COUNT(*) FROM save_recipe")
+  return Pool.query("SELECT COUNT(*) FROM like_recipe")
+}
+
+const findLikeId = (id) => {
+  return Pool.query("SELECT * FROM like_recipe WHERE id = $1", [id])
 }
 
 module.exports = {
@@ -70,4 +74,5 @@ module.exports = {
   insertLike,
   deleteLike,
   countData,
+  findLikeId
 }

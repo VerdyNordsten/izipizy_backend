@@ -62,6 +62,10 @@ const countData = () => {
   return Pool.query("SELECT COUNT(*) FROM save_recipe")
 }
 
+const findSaveId = (id) => {
+  return Pool.query("SELECT * FROM save_recipe WHERE id = $1", [id])
+}
+
 module.exports = {
   getSavesByUser,
   getSaveById,
@@ -70,4 +74,5 @@ module.exports = {
   insertSave,
   deleteSave,
   countData,
+  findSaveId
 }
