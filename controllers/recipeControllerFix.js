@@ -3,7 +3,7 @@ const commonHelper = require("../helper/common")
 const uuid = require("uuid")
 // var cloudinary = require("../config/cloudinary")
 const moment = require("moment")
-const { uploadFile } = require("../config/googleDrive.config")
+const { uploadFile, auth } = require("../config/googleDrive.config")
 // const { updatePhoto } = require("../config/googleDrive.config")
 
 const recipeController = {
@@ -118,8 +118,8 @@ const recipeController = {
       name_recipe,
       description,
       ingredients,
-      video: `https://drive.google.com/uc?id=${videoUrl.id}`,
-      image: `https://drive.google.com/uc?id=${imageUrl.id}`,
+      video: videoUrl,
+      image: imageUrl,
       user_id: userId,
     }
 
@@ -134,15 +134,14 @@ const recipeController = {
   updateRecipe: async (req, res) => {
     try {
       const id = req.params.id
-      const { name_recipe, description, ingredients } = req.body
+      const { name_recipe, description, ingredients, video } = req.body
       // Check if the recipe exists and if the user who created it is the same as the authenticated user
-      const recipeResult = await recipeModel.findId(id)
-      if (!recipeResult.rows || recipeResult.rows.length === 0) {
+      const { rows } = await recipeModel.findId(id)
+      if (rows.length === 0) {
         return res.json({
           message: "Recipe not found",
         })
       }
-      const rows = recipeResult.rows
 
       // Extract the user ID from the decoded token
       const userId = req.payload.id
@@ -155,8 +154,6 @@ const recipeController = {
       let data = {}
       let updateQuery = ""
       let message = "Recipe updated sucessfull"
-      const image = req.files.image?.[0] // Use optional chaining operator to check if req.files.image is defined
-      const video = req.files.video?.[0] // Use optional chaining operator to check if req.files.video is defined
       if (name_recipe) {
         data.name_recipe = name_recipe
         updateQuery += `name_recipe=$${Object.keys(data).length}`
@@ -170,13 +167,13 @@ const recipeController = {
         updateQuery += `${updateQuery ? ", " : ""}ingredients=$${Object.keys(data).length}`
       }
       if (video) {
-        const videoUrl = await uploadFile(video, "video/mp4")
-        data.video = `https://drive.google.com/uc?id=${videoUrl.id}`
+        data.video = video
         updateQuery += `${updateQuery ? ", " : ""}video=$${Object.keys(data).length}`
       }
-      if (image) {
-        const imageUrl = await uploadFile(image, "image/jpeg")
-        data.image = `https://drive.google.com/uc?id=${imageUrl.id}`
+      if (req.file) {
+        // const imageUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
+        const imageUrl = await uploadFile(auth, req.file)
+        data.image = imageUrl
         updateQuery += `${updateQuery ? ", " : ""}image=$${Object.keys(data).length}`
       }
 
