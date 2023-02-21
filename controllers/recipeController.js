@@ -3,6 +3,8 @@ const commonHelper = require("../helper/common")
 const uuid = require("uuid")
 var cloudinary = require("../config/cloudinary")
 const moment = require("moment")
+const { uploadFile } = require("../config/googleDrive.config")
+const { updatePhoto } = require("../config/googleDrive.config")
 
 const recipeController = {
   getAllRecipe: async (req, res) => {
@@ -102,7 +104,8 @@ const recipeController = {
     const { name_recipe, description, ingredients, video } = req.body
     const id = uuid.v4()
 
-    const imageUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
+    // const imageUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
+    const imageUrl = await uploadFile(auth, req.file)
 
     // Extract the user ID from the decoded token
     const userId = req.payload.id
@@ -165,7 +168,8 @@ const recipeController = {
         updateQuery += `${updateQuery ? ", " : ""}video=$${Object.keys(data).length}`
       }
       if (req.file) {
-        const imageUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
+        // const imageUrl = await cloudinary.uploader.upload(req.file.path, { folder: "izipizy" })
+        const imageUrl = await updatePhoto(auth, req.file)
         data.image = imageUrl.secure_url
         updateQuery += `${updateQuery ? ", " : ""}image=$${Object.keys(data).length}`
       }
