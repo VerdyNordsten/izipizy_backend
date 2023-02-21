@@ -48,10 +48,13 @@ async function uploadFile(file, mimeType) {
     const response = await driveService.files.create({
       resource: fileMetadata,
       media: media,
-      fields: "id",
+      fields: "id, webContentLink",
     })
 
-    return response.data
+    return {
+      metadata: response.data,
+      url: response.data.webContentLink
+    }
   } catch (error) {
     console.error(error)
     throw error
