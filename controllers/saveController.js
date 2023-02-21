@@ -88,8 +88,8 @@ const saveController = {
   deleteSave: async (req, res) => {
     try {
       const id = req.params.id
-      const { rowCount, rows } = await saveModel.getSaveById(id)
-      if (!rowCount) {
+      const { rows } = await saveModel.findSaveId(id)
+      if (!rows) {
         return commonHelper.response(res, null, 404, "Save not found")
       }
 

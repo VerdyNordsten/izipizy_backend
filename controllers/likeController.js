@@ -88,8 +88,8 @@ const likeController = {
   deleteLike: async (req, res) => {
     try {
       const id = req.params.id
-      const { rowCount, rows } = await likeModel.getLikeById(id)
-      if (!rowCount) {
+      const { rows } = await likeModel.findLikeId(id)
+      if (!rows) {
         return commonHelper.response(res, null, 404, "Like not found")
       }
 
