@@ -92,11 +92,11 @@ const userController = {
     const id = req.params.id;
     const { name, password } = req.body;
     let imageProfile;
-  
+
     if (userId !== id) {
       return commonHelper.response(res, null, 401, "You are not authorized to edit this profile");
     }
-  
+
     let newData = {};
     if (name) {
       newData.name = name;
@@ -104,24 +104,24 @@ const userController = {
     if (password) {
       newData.password = await bcrypt.hash(password, saltRounds);
     }
-  
+
     if (req.file) {
       const imageUrl = await cloudinary.uploader.upload(req.file.path, {
         folder: "izipizy",
       });
       imageProfile = imageUrl.secure_url;
     }
-  
+
     const dataPw = await userModel.findId(id);
-  
+
     const updatedData = {
       name: newData.name || dataPw.rows[0].name,
       password: newData.password || dataPw.rows[0].password,
       image_profile: imageProfile || dataPw.rows[0].image_profile,
     };
-  
+
     await userModel.editProfile(updatedData.name, updatedData.password, updatedData.image_profile, id);
-  
+
     const responseData = {
       id: dataPw.rows[0].id,
       name: updatedData.name,
@@ -129,9 +129,9 @@ const userController = {
       phone_number: dataPw.rows[0].phone_number,
       image_profile: updatedData.image_profile,
     };
-  
+
     commonHelper.response(res, responseData, 200, "Edit profile is successful");
-  },  
+  },
 }
 
 module.exports = userController
