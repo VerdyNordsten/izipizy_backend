@@ -6,7 +6,7 @@ const authHelper = require("../helper/auth")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const saltRounds = 10
-var cloudinary = require("../config/cloudinary")
+const { uploadFile, deleteFile, updateFile } = require("../config/googleDrive.config")
 
 const userController = {
   registerUser: async (req, res) => {
@@ -20,6 +20,7 @@ const userController = {
       }
       const hashPassword = await bcrypt.hash(password, saltRounds)
       const id = uuid.v4()
+
       const data = {
         id,
         name,
@@ -28,7 +29,7 @@ const userController = {
         phone_number: phone,
       }
       const result = await userModel.insertUser(data)
-      commonHelper.response(res, result.rows, 201, "Register has been success")
+      return commonHelper.response(res, result.rows, 201, "Register has been success")
     } catch (err) {
       res.send(err)
     }
@@ -37,9 +38,7 @@ const userController = {
   loginUser: async (req, res) => {
     try {
       const { email, password } = req.body
-      const {
-        rows: [user],
-      } = await userModel.findEmail(email)
+      const { rows: [user] } = await userModel.findEmail(email)
       if (!user) {
         return res.json({
           message: "Email is invalid",
@@ -54,12 +53,11 @@ const userController = {
       delete user.password
       let payload = {
         email: user.email,
-        id: user.id, // add the user ID to the payload
+        id: user.id, 
       }
-      // console.log(payload)
       user.token = authHelper.generateToken(payload)
       user.refreshToken = authHelper.generateRefreshToken(payload)
-      commonHelper.response(res, user, 201, "login is successful")
+      return commonHelper.response(res, user, 201, "login is successful")
     } catch (err) {
       res.send(err)
     }
@@ -75,7 +73,7 @@ const userController = {
       token: authHelper.generateToken(payload),
       refreshToken: authHelper.generateRefreshToken(payload),
     }
-    commonHelper.response(res, result, 200, "Get refresh token is successful")
+    return commonHelper.response(res, result, 200, "Get refresh token is successful")
   },
 
   profileUser: async (req, res) => {
@@ -84,7 +82,7 @@ const userController = {
       rows: [user],
     } = await userModel.findEmail(email)
     delete user.password
-    commonHelper.response(res, user, 200, "Get data profile is successful")
+    return commonHelper.response(res, user, 200, "Get data profile is successful")
   },
 
   editProfile: async (req, res) => {
@@ -104,15 +102,22 @@ const userController = {
     if (password) {
       newData.password = await bcrypt.hash(password, saltRounds);
     }
+    const image = req.file
+    const dataPw = await userModel.findId(id);
+    const { rows: [cekUser] } = dataPw
+    const imageSplit = cekUser?.image_profile.split("=")[1]
 
     if (req.file) {
-      const imageUrl = await cloudinary.uploader.upload(req.file.path, {
-        folder: "izipizy",
-      });
-      imageProfile = imageUrl.secure_url;
+      if (!cekUser?.image_profile) {
+        const imageUrl = await uploadFile(image, "image/jpeg")
+        imageProfile = `https://drive.google.com/uc?id=${imageUrl.id}`;
+      } else {
+        const imageUrl = await updateFile(image, "image/jpeg", imageSplit)
+        imageProfile = `https://drive.google.com/uc?id=${imageUrl.id}`;
+      }
+    } else {
+      imageProfile = cekUser?.image_profile
     }
-
-    const dataPw = await userModel.findId(id);
 
     const updatedData = {
       name: newData.name || dataPw.rows[0].name,
@@ -130,7 +135,7 @@ const userController = {
       image_profile: updatedData.image_profile,
     };
 
-    commonHelper.response(res, responseData, 200, "Edit profile is successful");
+    return commonHelper.response(res, responseData, 200, "Edit profile is successful");
   },
 }
 
