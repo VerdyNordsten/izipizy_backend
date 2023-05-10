@@ -85,6 +85,7 @@ async function updateFile(file, mimeType, id) {
   }
 }
 
+
 /**
  * Deletes a file from Google Drive.
  * @param {string} id - The ID of the file to delete.
