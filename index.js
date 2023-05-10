@@ -11,7 +11,12 @@ const mainRouter = require("./routes/index")
 const app = express()
 const port = process.env.PORT
 
-app.use(cors())
+app.use(cors({
+  origin: ['https://yumyum.digty.co.id', 'http://localhost:3000'],
+  methods: "GET, PUT, POST, DELETE",
+  credentials: true
+}))
+
 app.options('*', cors())
 app.use(express.json())
 app.use(morgan("dev"))
@@ -26,8 +31,6 @@ app.use((req, res, next) => {
 })
 
 app.use("/api/v1", mainRouter)
-
-// app.use("/img", express.static("upload"))
 
 app.all("*", (req, res, next) => {
   next(new createError.NotFound())
