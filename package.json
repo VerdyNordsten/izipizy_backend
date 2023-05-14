@@ -10,7 +10,6 @@
     "lint": "eslint --fix --ext .js,.jsx ."
   },
   "dependencies": {
-    "aws-client-s3": "^1.4.5",
     "bcrypt": "^5.1.0",
     "cloudinary": "^1.34.0",
     "cors": "^2.8.5",
