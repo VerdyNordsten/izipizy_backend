@@ -197,31 +197,31 @@ Project Link: [https://github.com/VerdyNordsten/izipizy_backend](https://github.
     <tr >
       <td align="center">
         <a href="https://github.com/hosealeonardo18">
-          <img width="200"  src="./documentation/hose.jpg" alt=""><br/>
+          <img width="200" height="300" src="./documentation/hosea.jpg" alt=""><br/>
           <b>Hose Leonardo</b>
         </a>
       </td>
       <td align="center">
         <a href="https://github.com/preedok">
-          <img width="200"  src="./documentation/iqbal.jpg" alt=""><br/>
+          <img width="200" height="300" src="./documentation/iqbal.jpg" alt=""><br/>
           <b>Muhamad Iqbal Aprido</b>
         </a>
       </td>
       <td align="center">
         <a href="https://github.com/Shaniara28">
-          <img width="200"  src="./documentation/shania.jpg" alt=""><br/>
+          <img width="200" height="300" src="./documentation/shania.jpg" alt=""><br/>
           <b>Shania Riski Agustin</b>
         </a>
       </td>
       <td align="center">
         <a href="https://github.com/RezaldhoArmadhani">
-          <img width="200"  src="./documentation/aldho.jpg" alt=""><br/>
+          <img width="200" height="300" src="./documentation/aldho.jpg" alt=""><br/>
           <b>Rezaldho Armadani</b>
         </a>
       </td>
       <td align="center">
         <a href="https://github.com/VerdyNordsten">
-          <img width="200"   src="./documentation/verdy.jpg" alt=""><br/>
+          <img width="200" height="300" src="./documentation/verdy.jpg" alt=""><br/>
           <b>Verdy Prido Lugara</b>
         </a>
       </td>
